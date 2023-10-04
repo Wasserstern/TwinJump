@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
     public float twinStickAcceleration;
     public float platformerMagnitude;
     public float platformerAcceleration;
+    public float platformerFallAcceleration;
 
     [SerializeField]
     bool isPlatformer;
@@ -43,18 +44,27 @@ public class Player : MonoBehaviour
     {
         GetInput();
         if(isPlatformer){ // Platformer mode
-            rgbd.gravityScale = 8f;
-
+            rgbd.gravityScale = 10f;
+            nextVelocity = new Vector2(rgbd.velocity.x + xInput * twinStickAcceleration * Time.deltaTime, rgbd.velocity.y);
+            if(Mathf.Abs(nextVelocity.x) > platformerMagnitude){
+                if(nextVelocity.x > 0){
+                    nextVelocity = new Vector2(platformerMagnitude, nextVelocity.y);
+                }
+                else{
+                    nextVelocity = new Vector2(-platformerMagnitude, nextVelocity.y);
+                }
+            }
         }
         else{ // Twin Stick Shooter mode
             rgbd.gravityScale = 0f;
-            nextVelocity = new Vector2(rgbd.velocity.x + (xInput * twinStickAcceleration) * Time.deltaTime, rgbd.velocity.y + (yInput * twinStickAcceleration) * Time.deltaTime);
+            nextVelocity = new Vector2(rgbd.velocity.x + xInput * twinStickAcceleration * Time.deltaTime, rgbd.velocity.y + (yInput * twinStickAcceleration) * Time.deltaTime);
 
             if(nextVelocity.magnitude > twinStickMagnitude){
                 nextVelocity = nextVelocity.normalized * twinStickMagnitude;
             }
-            rgbd.velocity = nextVelocity;
+            
         }
+        rgbd.velocity = nextVelocity;
     }
     
     void GetInput(){
