@@ -10,12 +10,19 @@ public class Player : MonoBehaviour
     public float twinStickAcceleration;
     public float platformerMagnitude;
     public float platformerAcceleration;
-    public float platformerFallAcceleration;
+    public float jumpForce;
+    public float changeBoost;
+    public float groundCheckDistance;
+    public float jumpCooldown;
 
     [SerializeField]
     bool isPlatformer;
     [SerializeField]
     bool isHoldingChange;
+    [SerializeField]
+    bool pressedJump;
+    [SerializeField]
+    bool isGrounded;
     [SerializeField]
     float xInput;
     [SerializeField]
@@ -24,6 +31,8 @@ public class Player : MonoBehaviour
     int currentLayer;
     [SerializeField]
     Vector2 nextVelocity;
+    [SerializeField]
+    bool isJumping;
 
     Rigidbody2D rgbd;
     Collider2D col;
@@ -40,10 +49,38 @@ public class Player : MonoBehaviour
         }
     }
 
+
     void Update()
     {
         GetInput();
+
+        if(isHoldingChange){
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("JellyEdge"), true);
+        }
+        else{
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("JellyEdge"), false);
+        }
+
+        if(LayerMask.LayerToName(Physics2D.OverlapCircle(transform.position, col.bounds.size.x / 3).gameObject.layer) == "Jelly"){
+            // Check if player is deep inside jelly
+            isPlatformer = false;
+        }
+
+
         if(isPlatformer){ // Platformer mode
+
+            // Check ground
+            if(rgbd.velocity.y <= 0f){
+                Vector2 rayDirection = (new Vector2(transform.position.x, transform.position.y -1) - (Vector2)transform.position).normalized;
+                RaycastHit2D hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y -1), rayDirection, groundCheckDistance, LayerMask.GetMask("Jelly", "JellyEdge"));
+                if(hit.collider != null){
+                    isGrounded = true;
+                }
+            }
+            else{
+                isGrounded = false;
+            }
+            //Set gravity to active and apply platformer variables
             rgbd.gravityScale = 10f;
             nextVelocity = new Vector2(rgbd.velocity.x + xInput * twinStickAcceleration * Time.deltaTime, rgbd.velocity.y);
             if(Mathf.Abs(nextVelocity.x) > platformerMagnitude){
@@ -54,42 +91,46 @@ public class Player : MonoBehaviour
                     nextVelocity = new Vector2(-platformerMagnitude, nextVelocity.y);
                 }
             }
+            if(pressedJump){
+                if(isGrounded && !isJumping){
+                    nextVelocity = new Vector2(nextVelocity.x, nextVelocity.y + jumpForce );
+                }
+            }
         }
         else{ // Twin Stick Shooter mode
             rgbd.gravityScale = 0f;
-            nextVelocity = new Vector2(rgbd.velocity.x + xInput * twinStickAcceleration * Time.deltaTime, rgbd.velocity.y + (yInput * twinStickAcceleration) * Time.deltaTime);
+            nextVelocity = new Vector2(rgbd.velocity.x + xInput * twinStickAcceleration * Time.deltaTime, rgbd.velocity.y + yInput * twinStickAcceleration * Time.deltaTime);
 
             if(nextVelocity.magnitude > twinStickMagnitude){
                 nextVelocity = nextVelocity.normalized * twinStickMagnitude;
             }
             
         }
-        rgbd.velocity = nextVelocity;
+        if(!isJumping){
+            rgbd.velocity = nextVelocity;
+        }
     }
     
     void GetInput(){
         isHoldingChange = Input.GetKey(KeyCode.J);
         xInput = Input.GetAxis("Horizontal");
         yInput = Input.GetAxis("Vertical");
+        pressedJump = Input.GetKeyDown(KeyCode.Space);
     }
 
     private void OnTriggerExit2D(Collider2D other){
         if(other.gameObject.layer == LayerMask.NameToLayer("Jelly")){
             // Push out of jelly
             isPlatformer = true;
+            
         }
         else if(other.gameObject.layer == LayerMask.NameToLayer("Air")){
             // Push inside jelly
             isPlatformer = false;
         }
     }
-    private void OnTriggerEnter2D(Collider2D other){
-        if(other.gameObject.layer == LayerMask.NameToLayer("Jelly")){
-            isPlatformer = false;
-        }
-        else if(other.gameObject.layer == LayerMask.NameToLayer("Air")){
-           
-        }
-    }
+
+
+  
 
 }
