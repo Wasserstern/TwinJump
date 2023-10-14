@@ -248,6 +248,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7596154888748057605, guid: d66a938e56f9dd94d9788b1168a3b198, type: 3}
+      propertyPath: m_Size.x
+      value: 0.99
+      objectReference: {fileID: 0}
+    - target: {fileID: 7596154888748057605, guid: d66a938e56f9dd94d9788b1168a3b198, type: 3}
+      propertyPath: m_Size.y
+      value: 0.99
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -768,10 +776,14 @@ MonoBehaviour:
   twinStickAcceleration: 80
   platformerMagnitude: 40
   platformerAcceleration: 80
+  platformerAccelerationBonus: 10
+  platformerDeceleration: 5
+  minPlatformerMagnitude: 1
   jumpForce: 40
   changeBoost: 10
   groundCheckDistance: 0.6
   jumpCooldown: 0.5
+  stickDeadZone: 0
   isPlatformer: 0
   isHoldingChange: 0
   pressedJump: 0

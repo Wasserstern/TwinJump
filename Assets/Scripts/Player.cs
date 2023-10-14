@@ -10,10 +10,15 @@ public class Player : MonoBehaviour
     public float twinStickAcceleration;
     public float platformerMagnitude;
     public float platformerAcceleration;
+    public float platformerAccelerationBonus;
+    public float platformerDeceleration;
+    public float minPlatformerMagnitude;
     public float jumpForce;
     public float changeBoost;
     public float groundCheckDistance;
     public float jumpCooldown;
+    [Range(0f, 1f)]
+    public float stickDeadZone;
 
     [SerializeField]
     bool isPlatformer;
@@ -72,7 +77,7 @@ public class Player : MonoBehaviour
             // Check ground
             if(rgbd.velocity.y <= 0f){
                 Vector2 rayDirection = (new Vector2(transform.position.x, transform.position.y -1) - (Vector2)transform.position).normalized;
-                RaycastHit2D hit = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y -1), rayDirection, groundCheckDistance, LayerMask.GetMask("Jelly", "JellyEdge"));
+                RaycastHit2D hit = Physics2D.Raycast((Vector2)transform.position, rayDirection, groundCheckDistance, LayerMask.GetMask("Jelly", "JellyEdge"));
                 if(hit.collider != null){
                     isGrounded = true;
                 }
@@ -82,13 +87,39 @@ public class Player : MonoBehaviour
             }
             //Set gravity to active and apply platformer variables
             rgbd.gravityScale = 10f;
-            nextVelocity = new Vector2(rgbd.velocity.x + xInput * twinStickAcceleration * Time.deltaTime, rgbd.velocity.y);
+            float accelerationBonus = 0f;
+            if(xInput > 0 && rgbd.velocity.x < 0){
+                accelerationBonus = -platformerAccelerationBonus;
+            }
+            else if(xInput < 0 && rgbd.velocity.x > 0){
+                accelerationBonus = platformerAccelerationBonus;
+            }
+            nextVelocity = new Vector2(rgbd.velocity.x + xInput * (platformerAcceleration + accelerationBonus) * Time.deltaTime, rgbd.velocity.y);
             if(Mathf.Abs(nextVelocity.x) > platformerMagnitude){
                 if(nextVelocity.x > 0){
                     nextVelocity = new Vector2(platformerMagnitude, nextVelocity.y);
                 }
                 else{
                     nextVelocity = new Vector2(-platformerMagnitude, nextVelocity.y);
+                }
+            }
+            if(xInput >= -stickDeadZone  && xInput <= stickDeadZone){
+                // No xInput, decellerate player
+                if(nextVelocity.x > 0){
+                   //TODO: ADD DECELERATION
+                   float xV = nextVelocity.x - platformerDeceleration * Time.deltaTime;
+                   if(xV <= minPlatformerMagnitude){
+                        xV = 0;
+                   }
+                   nextVelocity = new Vector2(xV, nextVelocity.y);
+                }
+                else{
+                    //TODO: ADD DECELERATION
+                    float xV = nextVelocity.x + platformerDeceleration * Time.deltaTime;
+                    if(xV >= -minPlatformerMagnitude){
+                        xV = 0;
+                    }
+                    nextVelocity = new Vector2(xV, nextVelocity.y);
                 }
             }
             if(pressedJump){
@@ -113,8 +144,8 @@ public class Player : MonoBehaviour
     
     void GetInput(){
         isHoldingChange = Input.GetKey(KeyCode.J);
-        xInput = Input.GetAxis("Horizontal");
-        yInput = Input.GetAxis("Vertical");
+        xInput = Input.GetAxisRaw("Horizontal");
+        yInput = Input.GetAxisRaw("Vertical");
         pressedJump = Input.GetKeyDown(KeyCode.Space);
     }
 
