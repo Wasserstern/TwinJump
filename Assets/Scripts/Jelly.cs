@@ -35,6 +35,7 @@ public class Jelly : MonoBehaviour
     private void OnTriggerExit2D(Collider2D other){
         if(other.gameObject.layer == LayerMask.NameToLayer("Player")){
             playerInside = false;
+            sleepEnemies.Invoke();
         }
     }
 }

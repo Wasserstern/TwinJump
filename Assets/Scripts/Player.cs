@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
 
+    public float health;
+    public float damageTimeout;
     public float twinStickMagnitude;
     public float twinStickAcceleration;
     public float platformerMagnitude;
@@ -41,6 +44,9 @@ public class Player : MonoBehaviour
 
     Rigidbody2D rgbd;
     Collider2D col;
+
+    bool isDying;
+    bool damageTimerRunning;
     void Start()
     {
         rgbd = GetComponent<Rigidbody2D>();
@@ -159,6 +165,34 @@ public class Player : MonoBehaviour
             // Push inside jelly
             isPlatformer = false;
         }
+    }
+
+    public void DamagePlayer(float damage){
+        if(!damageTimerRunning){
+            damageTimerRunning = true;
+            StartCoroutine(DamageTimer(damage));
+        }
+    }
+
+    IEnumerator DamageTimer(float damage){
+        health -= damage;
+        if(health <= 0){
+            isDying = true;
+            StartCoroutine(Death());
+        }
+
+        float startTime = Time.time;
+        float elapsedTime = 0f;
+        while(Time.time - startTime < damageTimeout){
+            float t = elapsedTime / damageTimeout;
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        yield return new WaitForSeconds(damageTimeout);
+    }
+
+    IEnumerator Death(){
+        return null;
     }
 
 

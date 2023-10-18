@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3771352670836951570}
   - component: {fileID: 5404124953940739690}
   - component: {fileID: 7596154888748057605}
+  - component: {fileID: 2292781374573656157}
   m_Layer: 7
   m_Name: JellyBlock
   m_TagString: Untagged
@@ -129,8 +130,28 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.99, y: 0.99}
   m_EdgeRadius: 0
+--- !u!114 &2292781374573656157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3546047839165368988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8cbe5003731e642a52ed6ea9ce2e16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerInside: 0
+  wakeEnemies:
+    m_PersistentCalls:
+      m_Calls: []
+  sleepEnemies:
+    m_PersistentCalls:
+      m_Calls: []
+  wakeIntervalTime: 0.2
 --- !u!1 &4222992184141762859
 GameObject:
   m_ObjectHideFlags: 0
