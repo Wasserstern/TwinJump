@@ -149,7 +149,7 @@ public class Player : MonoBehaviour
     }
     
     void GetInput(){
-        isHoldingChange = Input.GetKey(KeyCode.J);
+        isHoldingChange = Input.GetKey(KeyCode.LeftShift);
         xInput = Input.GetAxisRaw("Horizontal");
         yInput = Input.GetAxisRaw("Vertical");
         pressedJump = Input.GetKeyDown(KeyCode.Space);
@@ -189,6 +189,7 @@ public class Player : MonoBehaviour
             yield return null;
         }
         yield return new WaitForSeconds(damageTimeout);
+        damageTimerRunning = false;
     }
 
     IEnumerator Death(){

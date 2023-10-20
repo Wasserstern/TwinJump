@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    public float health;
     public string enemyName;
     public float enemyCollisionDamage;
     MonoBehaviour enemyScript;
@@ -39,6 +40,13 @@ public class Enemy : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other){
         if(other.gameObject.layer == LayerMask.NameToLayer("Player")){
             other.gameObject.GetComponent<Player>().DamagePlayer(enemyCollisionDamage);
+        }
+    }
+
+    public void DamageEnemy(float damage){
+        this.health -= damage;
+        if(health <= 0){
+            Destroy(this.gameObject);
         }
     }
 }

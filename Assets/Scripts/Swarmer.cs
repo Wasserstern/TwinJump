@@ -21,7 +21,6 @@ public class Swarmer : MonoBehaviour
     {
         if(isAwake){
             playerDirection = ((Vector2)target.transform.position - (Vector2)transform.position).normalized;
-            Debug.Log(playerDirection);
             rgbd.velocity = playerDirection * swarmerSpeed;
         }
         else{
