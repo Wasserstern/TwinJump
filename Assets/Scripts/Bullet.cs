@@ -15,16 +15,20 @@ public class Bullet : MonoBehaviour
     float speed;
     float bounciness;
     int pierceCount;
+    float lifeTime;
 
     bool isPrepared;
     bool hasBeenShot;
 
-    public void PrepareBullet(Vector2 direction,float strength, float speed, float bounciness, int pierceCount){
+    float lifeTimeTimer;
+
+    public void PrepareBullet(Vector2 direction,float strength, float speed, float bounciness, int pierceCount, float lifeTime = 5f){
         this.direction = direction;
         this.strength = strength;
         this.speed = speed;
         this.bounciness = bounciness;
         this.pierceCount = pierceCount;
+        this.lifeTime = lifeTime;
 
         //rgbd.sharedMaterial.bounciness = this.bounciness;
 
@@ -48,6 +52,10 @@ public class Bullet : MonoBehaviour
             if(rgbd.velocity.magnitude < speed / 10){
                 ShatterBullet();
             }
+            lifeTimeTimer+= Time.deltaTime;
+            if(lifeTimeTimer > lifeTime){
+                ShatterBullet();
+            }
         }
 
 
@@ -60,6 +68,25 @@ public class Bullet : MonoBehaviour
             pierceCount--;
             if(pierceCount < 0){
                 ShatterBullet();
+            }
+        }
+        else if(other.gameObject.layer == LayerMask.NameToLayer("Player")){
+            other.gameObject.GetComponent<Player>().DamagePlayer(strength);
+
+            pierceCount--;
+            if(pierceCount < 0){
+                ShatterBullet();
+            }
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D other){
+        if(other.gameObject.layer == LayerMask.NameToLayer("JellyEdge")){
+            if(bounciness <= 0){
+                pierceCount--;
+                if(pierceCount < 0){
+                    ShatterBullet();
+                }
             }
         }
     }
