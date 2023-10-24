@@ -63,8 +63,10 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other){
         if(other.gameObject.layer == LayerMask.NameToLayer("Enemy")){
-            other.gameObject.GetComponent<Enemy>().DamageEnemy(strength);
-            
+            var enemy = other.gameObject.GetComponent<Enemy>();
+            if(enemy != null){
+                enemy.DamageEnemy(strength);
+            }
             pierceCount--;
             if(pierceCount < 0){
                 ShatterBullet();
