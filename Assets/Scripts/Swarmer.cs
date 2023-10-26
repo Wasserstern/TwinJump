@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Swarmer : MonoBehaviour
@@ -10,11 +11,15 @@ public class Swarmer : MonoBehaviour
     bool isAwake;
     Rigidbody2D rgbd;
     public float swarmerSpeed;
+    public int splitCount;
     void Start()
     {
         target = GameObject.Find("Player").transform;
         playerScript = target.GetComponent<Player>();
         rgbd = GetComponent<Rigidbody2D>();
+        if(splitCount > 0){
+            this.gameObject.layer = LayerMask.NameToLayer("Splitter");
+        }
     }
 
     void Update()
@@ -35,4 +40,15 @@ public class Swarmer : MonoBehaviour
     public void SleepSwarmer(){
         isAwake = false;
     }
+
+    private void OnTriggerEnter2D(Collider2D other){
+        if(other.gameObject.layer == LayerMask.NameToLayer("Bullet")){
+            splitCount--;
+            if(splitCount <= 0){
+                
+            }
+        }
+    }
+
+    
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Enemy : MonoBehaviour
 {
@@ -46,6 +47,32 @@ public class Enemy : MonoBehaviour
     public void DamageEnemy(float damage){
         this.health -= damage;
         if(health <= 0){
+            switch(name){
+                case "Splitter":{
+                    Splitter splitter = GetComponent<Splitter>();
+                    if(splitter.splitCount > 0){
+                        Transform playerTransform = GameObject.Find("Player").transform;
+                        Vector2 splitDirection = ((Vector2)transform.position) - ((Vector2)playerTransform.position).normalized;
+                        for(int i = 0; i< splitter.splitAmount; i++){
+                            GameObject newSplitter = GameObject.Instantiate(splitter.splitterInactivePrefab);
+                            float randomAngle = Random.Range(-splitter.splitMaxAngle, splitter.splitMaxAngle);
+                            Vector2 rotatedDirection = Quaternion.Euler(0, 0, randomAngle) * splitDirection;
+                            newSplitter.transform.position = transform.position;
+                            StartCoroutine(newSplitter.GetComponent<Splitter>().PrepareSplitter(splitter.splitCount -1, splitter.splitterScale / 1.5f, rotatedDirection));
+                        }
+                    }
+                    break;
+                }
+                case "Gusher":{
+                    break;
+                }
+                case "Swarmer":{
+                    break;
+                }
+                case "Worm":{
+                    break;
+                }
+            }
             Destroy(this.gameObject);
         }
     }

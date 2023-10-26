@@ -23,6 +23,7 @@ public class Worm : MonoBehaviour
     public float segmentSampleRate;
     public float currentSampleTime;
     public float segmentDistance;
+    public float rotationAnglesPerSecond;
 
     [SerializeField]
     bool isAwake;
@@ -53,18 +54,9 @@ public class Worm : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        if(isAwake){
-            if(isFollowingPlayer)
-            {
-                // Simply move towards player
-                playerDirection = ((Vector2)target.transform.position - (Vector2)transform.position).normalized;
-                rgbd.velocity = playerDirection * wormSpeed;
-            }
-            else
-            {
-                // Move to currentDirection
+
+    void MoveWorm(){
+        // Move to currentDirection
                 rgbd.velocity = currentDirection * wormSpeed;
 
                 // Move segments
@@ -86,6 +78,19 @@ public class Worm : MonoBehaviour
                     }
                 }
                 currentSampleTime += Time.deltaTime;
+    }
+    void Update()
+    {
+        if(isAwake){
+            if(isFollowingPlayer)
+            {
+                // Simply move towards player
+                playerDirection = ((Vector2)target.transform.position - (Vector2)transform.position).normalized;
+                rgbd.velocity = playerDirection * wormSpeed;
+            }
+            else
+            {
+                MoveWorm();
             }
         }
         else{
@@ -94,6 +99,10 @@ public class Worm : MonoBehaviour
             }
             else{
                 // Keep moving
+                MoveWorm();
+                transform.Rotate(new Vector3(0, 0,rotationAnglesPerSecond * Time.deltaTime));
+                Vector2 newDirection = ((Vector2)wormDirector.position - (Vector2)transform.position).normalized;
+                currentDirection = newDirection;
             }
         }
         
